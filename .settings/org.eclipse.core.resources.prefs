@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//src/main/java/com/zadrozny/krzysztof/dao/impl/OrderDaoImpl.java=UTF-8
+encoding//src/main/webapp/WEB-INF/flows/order/cancelOrder.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/flows/order/collectInvoiceDetail.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/flows/order/collectShippingDetail.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/flows/order/selectAPaymentMethod.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/flows/order/selectProofOfPurchase.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/flows/order/summaryDetails.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/editOrderAddress.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/productList.jsp=UTF-8

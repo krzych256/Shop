@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+	
+	<var name="order" class="com.zadrozny.krzysztof.model.OrdersCheck"/>
+	<var name="shippingAddress" class="com.zadrozny.krzysztof.model.ShippingAddress"/>
+	<var name="business" class="com.zadrozny.krzysztof.model.Business"/>
+	
+	<on-start>
+    	<evaluate expression="new com.zadrozny.krzysztof.model.OrdersCheck()" result="order" />
+    	<evaluate expression="userDaoImpl.getUserByEmail(requestParameters.usersEmail)" result="order.users"/>
+	</on-start>
+	
+	<action-state id="checkCart">
+		<on-entry>					
+    		<evaluate expression="cartDaoImpl.validateCart(externalContext.sessionMap.myCart)" />  
+		</on-entry>
+        <evaluate expression="new com.zadrozny.krzysztof.model.Cart(externalContext.sessionMap.myCart)" result="order.cart" />
+        <transition to="cancelOrder" on-exception="java.io.IOException" />
+        <transition to="selectProofOfPurchase" />
+    </action-state>
+    	
+	<view-state id="selectProofOfPurchase">
+        <transition on="choiceOfReceipt" to="selectAPaymentMethod" />
+        <transition on="choiceOfInvoice" to="addNewBusiness" />
+    </view-state>
+        
+    <action-state id="addNewBusiness">		
+		<set name="order.business" value="business" />
+		<transition to="collectInvoiceDetail" />
+	</action-state>
+    
+	<view-state id="collectInvoiceDetail" model="business" > 
+        <transition on="sendData" to="selectAPaymentMethod"  />
+        <transition on="backToPurchase" to="selectProofOfPurchase"/>
+    </view-state>
+
+	<view-state id="selectAPaymentMethod" model="order"> 
+        <transition on="sendDataPayment" to="addNewShippingAddress" />
+        <transition on="backToPurchase" to="selectProofOfPurchase" />
+    </view-state>
+    
+    <action-state id="addNewShippingAddress">
+    	<set name="flowScope.order.shippingAddress" value="shippingAddress"/> 
+		<transition to="collectShippingDetail" />
+	</action-state>
+
+	<view-state id="collectShippingDetail" model="shippingAddress"> 
+        <transition on="sendDataShipping" to="summaryDetails" />
+        <transition on="backToPaymant" to="selectAPaymentMethod" />
+    </view-state>
+
+	<view-state id="summaryDetails" model="order"> 
+        <transition on="acceptOrder" to="successOrder" />
+        <transition on="backToPaymant" to="selectAPaymentMethod" />
+    </view-state>
+
+	<action-state id="successOrder">
+		<on-entry>					
+    		<evaluate expression="orderDaoImpl.saveOrder(order)" />    	
+		</on-entry>
+		<evaluate expression="externalContext.sessionMap.remove('myCart')"/>
+    	<transition to="thankCustomer" />
+	</action-state>	
+
+	<end-state id="thankCustomer" view="thankCustomer.jsp" />
+	
+	<end-state id="cancelOrder" view="cancelOrder.jsp" />
+	
+	<global-transitions>
+        <transition on="cancel" to="cancelOrder" />
+    </global-transitions>
+    
+</flow>
